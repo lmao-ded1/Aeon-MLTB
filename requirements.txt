@@ -23,6 +23,7 @@ aioqbt
 aient
 beautifulsoup4
 cloudscraper
+cachetools
 cryptography>=41.0.0
 codext>=1.15.6
 chardet
