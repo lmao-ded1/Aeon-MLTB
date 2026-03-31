@@ -3019,7 +3019,7 @@ async def gen_mediainfo(
                     # Add a section with the error for debugging
                     tc += "<blockquote>Analysis Info</blockquote><pre>"
                     tc += f"{'Analysis method':<28}: Basic file analysis (ffprobe and mediainfo failed)\n"
-                    tc += f"{'ffprobe error':<28}: {stderr if stderr else 'No error message provided'}\n"
+                    tc += f"{'ffprobe error':<28}: {stderr or 'No error message provided'}\n"
                     tc += "</pre><br>"
 
                     # If in silent mode, create Telegraph page and return link ID

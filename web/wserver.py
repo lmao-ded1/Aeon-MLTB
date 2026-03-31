@@ -836,16 +836,16 @@ async def health_check():
         # Get stream utilities
         (
             StreamClientManager,
-            ByteStreamer,
-            ParallelByteStreamer,
-            ParallelDownloader,
-            RawByteStreamer,
-            create_raw_streamer,
-            get_hash,
-            get_fname,
-            validate_stream_request,
-            get_mime_type,
-            is_streamable_file,
+            _ByteStreamer,
+            _ParallelByteStreamer,
+            _ParallelDownloader,
+            _RawByteStreamer,
+            _create_raw_streamer,
+            _get_hash,
+            _get_fname,
+            _validate_stream_request,
+            _get_mime_type,
+            _is_streamable_file,
         ) = get_stream_utils()
 
         # Check if File2Link is enabled
@@ -857,7 +857,7 @@ async def health_check():
             }
 
         # Check if bot client is available
-        client, client_id = StreamClientManager.get_optimal_client()
+        client, _client_id = StreamClientManager.get_optimal_client()
         bot_ready = client is not None
 
         # Check configuration
@@ -892,11 +892,7 @@ async def health_check():
             "channel_access": channel_access,
             "streaming_ready": streaming_ready,
             "bin_channel_configured": bool(Config.FILE2LINK_BIN_CHANNEL),
-            "bin_channel_id": (
-                Config.FILE2LINK_BIN_CHANNEL
-                if Config.FILE2LINK_BIN_CHANNEL
-                else None
-            ),
+            "bin_channel_id": (Config.FILE2LINK_BIN_CHANNEL or None),
             "helper_tokens_configured": bool(Config.HELPER_TOKENS),
             "total_clients": client_info.get("total_clients", 1),
             "helper_bots_count": client_info.get("helper_bots_count", 0),
@@ -945,17 +941,17 @@ def parse_stream_request(path: str) -> tuple[int, str]:
     """Parse streaming request path to extract message ID and hash"""
     # Get stream utilities
     (
-        StreamClientManager,
-        ByteStreamer,
-        ParallelByteStreamer,
-        ParallelDownloader,
-        RawByteStreamer,
-        create_raw_streamer,
-        get_hash,
-        get_fname,
+        _StreamClientManager,
+        _ByteStreamer,
+        _ParallelByteStreamer,
+        _ParallelDownloader,
+        _RawByteStreamer,
+        _create_raw_streamer,
+        _get_hash,
+        _get_fname,
         validate_stream_request,
-        get_mime_type,
-        is_streamable_file,
+        _get_mime_type,
+        _is_streamable_file,
     ) = get_stream_utils()
 
     match = PATTERN_HASH_FIRST.match(path)
@@ -1001,12 +997,12 @@ async def stream_preview(path: str, request: Request):
             StreamClientManager,
             ByteStreamer,
             ParallelByteStreamer,
-            ParallelDownloader,
+            _ParallelDownloader,
             RawByteStreamer,
             create_raw_streamer,
             get_hash,
-            get_fname,
-            validate_stream_request,
+            _get_fname,
+            _validate_stream_request,
             get_mime_type,
             is_streamable_file,
         ) = get_stream_utils()
@@ -1111,7 +1107,7 @@ async def stream_preview(path: str, request: Request):
         # Extract filename from path or get from file info with comprehensive fallback
         try:
             if "/" in path:
-                filename = unquote(path.split("/")[-1])
+                filename = unquote(path.rsplit("/", maxsplit=1)[-1])
             else:
                 filename = file_info.get("file_name", "Unknown File")
 
@@ -1229,16 +1225,16 @@ async def download_file(path: str, request: Request):
         # Get stream utilities
         (
             StreamClientManager,
-            ByteStreamer,
-            ParallelByteStreamer,
-            ParallelDownloader,
+            _ByteStreamer,
+            _ParallelByteStreamer,
+            _ParallelDownloader,
             RawByteStreamer,
             create_raw_streamer,
             get_hash,
             get_fname,
             validate_stream_request,
             get_mime_type,
-            is_streamable_file,
+            _is_streamable_file,
         ) = get_stream_utils()
 
         # Parse path first

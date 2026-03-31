@@ -78,7 +78,7 @@ class MegaSearchHandler:
                 return
 
             # Check current node name
-            node_name = node.getName() if node.getName() else ""
+            node_name = node.getName() or ""
             if query_lower in node_name.lower():
                 results.append(node)
 

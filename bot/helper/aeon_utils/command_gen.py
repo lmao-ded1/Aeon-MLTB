@@ -559,7 +559,7 @@ async def get_image_watermark_cmd(
         return None, None
 
     # Add threads parameter if not already added
-    if "-threads" not in cmd and media_type not in ["subtitle"]:
+    if "-threads" not in cmd and media_type != "subtitle":
         cmd.extend(["-threads", f"{thread_count}", temp_file])
 
     return cmd, temp_file
@@ -1984,7 +1984,7 @@ async def get_watermark_cmd(
         return None, None
 
     # Add threads parameter if not already added
-    if "-threads" not in cmd and media_type not in ["subtitle"]:
+    if "-threads" not in cmd and media_type != "subtitle":
         cmd.extend(["-threads", f"{thread_count}", temp_file])
 
     # Log the generated command for debugging only
@@ -2090,7 +2090,7 @@ async def get_metadata_cmd(
 
         # Get media information if it's a media file
         try:
-            duration, artist, title = await get_media_info(file_path)
+            duration, _artist, title = await get_media_info(file_path)
             if duration and duration > 0:
                 hours = duration // 3600
                 minutes = (duration % 3600) // 60
@@ -2679,34 +2679,24 @@ async def get_metadata_cmd(
         )
     else:
         # Global metadata (fallback to legacy key if not provided)
-        global_title_value = title if title else key
-        global_author_value = author if author else key
-        global_comment_value = comment if comment else key
+        global_title_value = title or key
+        global_author_value = author or key
+        global_comment_value = comment or key
 
         # Video track metadata (fallback to global values if not provided)
-        video_title_value = video_title if video_title else global_title_value
-        video_author_value = video_author if video_author else global_author_value
-        video_comment_value = (
-            video_comment if video_comment else global_comment_value
-        )
+        video_title_value = video_title or global_title_value
+        video_author_value = video_author or global_author_value
+        video_comment_value = video_comment or global_comment_value
 
         # Audio track metadata (fallback to global values if not provided)
-        audio_title_value = audio_title if audio_title else global_title_value
-        audio_author_value = audio_author if audio_author else global_author_value
-        audio_comment_value = (
-            audio_comment if audio_comment else global_comment_value
-        )
+        audio_title_value = audio_title or global_title_value
+        audio_author_value = audio_author or global_author_value
+        audio_comment_value = audio_comment or global_comment_value
 
         # Subtitle track metadata (fallback to global values if not provided)
-        subtitle_title_value = (
-            subtitle_title if subtitle_title else global_title_value
-        )
-        subtitle_author_value = (
-            subtitle_author if subtitle_author else global_author_value
-        )
-        subtitle_comment_value = (
-            subtitle_comment if subtitle_comment else global_comment_value
-        )
+        subtitle_title_value = subtitle_title or global_title_value
+        subtitle_author_value = subtitle_author or global_author_value
+        subtitle_comment_value = subtitle_comment or global_comment_value
 
     # Start building the FFmpeg command
     cmd = [
@@ -2907,13 +2897,13 @@ async def get_metadata_cmd(
             else:
                 # Determine mimetype based on codec_name if available
                 codec_name = stream.get("codec_name", "").lower()
-                if codec_name in ["ttf"]:
+                if codec_name == "ttf":
                     mimetype = "application/x-truetype-font"
-                elif codec_name in ["otf"]:
+                elif codec_name == "otf":
                     mimetype = "application/vnd.ms-opentype"
-                elif codec_name in ["woff"]:
+                elif codec_name == "woff":
                     mimetype = "application/font-woff"
-                elif codec_name in ["woff2"]:
+                elif codec_name == "woff2":
                     mimetype = "application/font-woff2"
                 else:
                     # Use a generic mimetype
@@ -3949,7 +3939,7 @@ async def get_merge_filter_complex_cmd(
             # Use set to avoid duplicate mappings
             mapped_tracks = set()
             for match in outa_matches:
-                track_num = match if match else "0"
+                track_num = match or "0"
                 track_label = f"[outa{track_num}]"
                 if track_label not in mapped_tracks:
                     map_args.extend(["-map", track_label])
@@ -4439,9 +4429,9 @@ async def get_merge_mixed_cmd(
 
     # Use files in the order they were provided
     # (No sorting to preserve user's intended order)
-    video_files = video_files if video_files else []
-    audio_files = audio_files if audio_files else []
-    subtitle_files = subtitle_files if subtitle_files else []
+    video_files = video_files or []
+    audio_files = audio_files or []
+    subtitle_files = subtitle_files or []
 
     # Determine output path based on first available file and media types
     base_files = video_files or audio_files or subtitle_files
@@ -4860,7 +4850,9 @@ async def get_merge_mixed_cmd(
                                     # Adjust all timestamps in the subtitle file
                                     adjusted_content = re.sub(
                                         r"(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})",
-                                        lambda m: f"{adjust_timestamp(m.group(1), scale_factor)} --> {adjust_timestamp(m.group(2), scale_factor)}",
+                                        lambda m: (
+                                            f"{adjust_timestamp(m.group(1), scale_factor)} --> {adjust_timestamp(m.group(2), scale_factor)}"
+                                        ),
                                         content,
                                     )
 
@@ -5090,7 +5082,9 @@ async def get_merge_mixed_cmd(
                             # Adjust all timestamps in the subtitle file
                             adjusted_content = re.sub(
                                 r"(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})",
-                                lambda m: f"{adjust_timestamp(m.group(1), scale_factor)} --> {adjust_timestamp(m.group(2), scale_factor)}",
+                                lambda m: (
+                                    f"{adjust_timestamp(m.group(1), scale_factor)} --> {adjust_timestamp(m.group(2), scale_factor)}"
+                                ),
                                 content,
                             )
 
@@ -6218,7 +6212,7 @@ async def get_trim_cmd(
                 except (ValueError, TypeError):
                     cmd.extend(["-q:v", "1"])  # Default to best quality
         # For PNG files
-        elif file_ext in [".png"]:
+        elif file_ext == ".png":
             if (
                 not image_quality
                 or image_quality.lower() == "none"
@@ -9653,7 +9647,7 @@ async def get_add_cmd(
                     )
 
                     # Try to use a compatible format, but expect potential issues
-                    if subtitle_ext in ["srt"]:
+                    if subtitle_ext == "srt":
                         # Try SRT codec, but it may still fail
                         codec_args.extend(["-c:s", "srt"])
                         LOGGER.info("Attempting SRT codec for AVI (may fail)")
@@ -9986,7 +9980,7 @@ async def get_remove_cmd(
 
     # Get file info
     file_name = os.path.basename(file_path)
-    name, ext = os.path.splitext(file_name)
+    _name, ext = os.path.splitext(file_name)
 
     # Determine output format based on settings and content
     output_ext = ext

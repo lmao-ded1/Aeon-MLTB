@@ -521,9 +521,7 @@ async def trace_command(client, message: Message):
         return
 
     # Get the message to process (reply or current)
-    target_message = (
-        message.reply_to_message if message.reply_to_message else message
-    )
+    target_message = message.reply_to_message or message
 
     # Get media from message
     file_path_or_url, media_type, is_url = await get_media_for_trace(target_message)

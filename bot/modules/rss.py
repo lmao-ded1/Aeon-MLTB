@@ -1143,7 +1143,7 @@ async def rss_monitor():
                 break
             except Exception as e:
                 error_msg = str(e) if e else "Unknown error"
-                feed_name = title if title else "Unknown"
+                feed_name = title or "Unknown"
                 feed_link = data.get("link", "Unknown") if data else "Unknown"
                 LOGGER.error(
                     f"RSS Feed Error: {error_msg} - Feed Name: {feed_name} - Feed Link: {feed_link}"

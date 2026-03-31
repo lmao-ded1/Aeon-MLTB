@@ -809,7 +809,7 @@ def smart_split_message(text: str, max_length: int = 4096) -> list[str]:
                 if remaining_text and open_tags:
                     remaining_text = reopen_tags(open_tags) + remaining_text
 
-    return final_chunks if final_chunks else [text[:max_length]]
+    return final_chunks or [text[:max_length]]
 
 
 def validate_html_integrity(text: str) -> str:

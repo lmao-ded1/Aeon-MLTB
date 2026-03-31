@@ -2304,231 +2304,251 @@ async def try_auto_decode(text: str) -> dict:
         # Base encodings (most common) - order by likelihood
         (
             "base64",
-            lambda t: all(
-                c
-                in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
-                for c in t
-            )
-            and len(t) % 4 == 0
-            and len(t) >= 4
-            and not all(c.isdigit() for c in t),
+            lambda t: (
+                all(
+                    c
+                    in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+                    for c in t
+                )
+                and len(t) % 4 == 0
+                and len(t) >= 4
+                and not all(c.isdigit() for c in t)
+            ),
         ),
         (
             "base32",
-            lambda t: all(
-                c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=" for c in t.upper()
-            )
-            and len(t) % 8 == 0
-            and len(t) >= 8,
+            lambda t: (
+                all(c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=" for c in t.upper())
+                and len(t) % 8 == 0
+                and len(t) >= 8
+            ),
         ),
         (
             "base16",
-            lambda t: all(c in "0123456789ABCDEFabcdef" for c in t)
-            and len(t) % 2 == 0
-            and len(t) >= 4
-            and len(t) <= 100,
+            lambda t: (
+                all(c in "0123456789ABCDEFabcdef" for c in t)
+                and len(t) % 2 == 0
+                and len(t) >= 4
+                and len(t) <= 100
+            ),
         ),
         # URL encoding (check for % followed by hex digits, allow more URL characters)
         (
             "url",
-            lambda t: "%" in t
-            and all(
-                c
-                in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%+-._~=&@:"
-                for c in t
-            )
-            and any(
-                t[i : i + 3]
-                for i in range(len(t) - 2)
-                if t[i] == "%"
-                and len(t[i : i + 3]) == 3
-                and all(c in "0123456789ABCDEFabcdef" for c in t[i + 1 : i + 3])
+            lambda t: (
+                "%" in t
+                and all(
+                    c
+                    in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789%+-._~=&@:"
+                    for c in t
+                )
+                and any(
+                    t[i : i + 3]
+                    for i in range(len(t) - 2)
+                    if t[i] == "%"
+                    and len(t[i : i + 3]) == 3
+                    and all(c in "0123456789ABCDEFabcdef" for c in t[i + 1 : i + 3])
+                )
             ),
         ),
         # Hex encoding (even length, all hex chars, reasonable length, not pure binary, contains A-F)
         (
             "hex",
-            lambda t: all(c in "0123456789ABCDEFabcdef" for c in t)
-            and len(t) % 2 == 0
-            and len(t) >= 6
-            and len(t) <= 200
-            and any(c in "ABCDEFabcdef" for c in t)
-            and not all(c in "01" for c in t),
+            lambda t: (
+                all(c in "0123456789ABCDEFabcdef" for c in t)
+                and len(t) % 2 == 0
+                and len(t) >= 6
+                and len(t) <= 200
+                and any(c in "ABCDEFabcdef" for c in t)
+                and not all(c in "01" for c in t)
+            ),
         ),
         # Binary (only 0s, 1s, and spaces, proper length, prioritize over hex)
         (
             "binary",
-            lambda t: all(c in "01 " for c in t)
-            and len(t.replace(" ", "")) % 8 == 0
-            and len(t.replace(" ", "")) >= 8
-            and (t.count("0") + t.count("1")) / len(t.replace(" ", "")) == 1,
+            lambda t: (
+                all(c in "01 " for c in t)
+                and len(t.replace(" ", "")) % 8 == 0
+                and len(t.replace(" ", "")) >= 8
+                and (t.count("0") + t.count("1")) / len(t.replace(" ", "")) == 1
+            ),
         ),  # Only binary digits
         # Morse code (dots, dashes, spaces, slashes)
         (
             "morse",
-            lambda t: all(c in ".-/ \n\t" for c in t)
-            and ("." in t or "-" in t)
-            and len(t) >= 3,
+            lambda t: (
+                all(c in ".-/ \n\t" for c in t)
+                and ("." in t or "-" in t)
+                and len(t) >= 3
+            ),
         ),
         # ROT13 (contains letters but doesn't look like normal English, and has vowel patterns suggesting encoding)
         (
             "rot13",
-            lambda t: any(c.isalpha() for c in t)
-            and len(t) >= 8
-            and not any(
-                word in t.lower()
-                for word in [
-                    "the",
-                    "and",
-                    "for",
-                    "are",
-                    "but",
-                    "not",
-                    "you",
-                    "all",
-                    "can",
-                    "had",
-                    "her",
-                    "was",
-                    "one",
-                    "our",
-                    "out",
-                    "day",
-                    "get",
-                    "has",
-                    "him",
-                    "his",
-                    "how",
-                    "man",
-                    "new",
-                    "now",
-                    "old",
-                    "see",
-                    "two",
-                    "way",
-                    "who",
-                    "boy",
-                    "did",
-                    "its",
-                    "let",
-                    "put",
-                    "say",
-                    "she",
-                    "too",
-                    "use",
-                    "hello",
-                    "world",
-                    "test",
-                    "this",
-                    "that",
-                    "with",
-                    "from",
-                    "they",
-                    "know",
-                    "want",
-                    "been",
-                    "good",
-                    "much",
-                    "some",
-                    "time",
-                    "very",
-                    "when",
-                    "come",
-                    "here",
-                    "just",
-                    "like",
-                    "long",
-                    "make",
-                    "many",
-                    "over",
-                    "such",
-                    "take",
-                    "than",
-                    "them",
-                    "well",
-                    "were",
-                    "https",
-                    "www",
-                    "example",
-                    "com",
-                ]
-            )
-            and len([c for c in t if c.isalpha()]) > 0
-            and sum(1 for c in t.lower() if c in "aeiou")
-            / len([c for c in t if c.isalpha()])
-            < 0.3,
+            lambda t: (
+                any(c.isalpha() for c in t)
+                and len(t) >= 8
+                and not any(
+                    word in t.lower()
+                    for word in [
+                        "the",
+                        "and",
+                        "for",
+                        "are",
+                        "but",
+                        "not",
+                        "you",
+                        "all",
+                        "can",
+                        "had",
+                        "her",
+                        "was",
+                        "one",
+                        "our",
+                        "out",
+                        "day",
+                        "get",
+                        "has",
+                        "him",
+                        "his",
+                        "how",
+                        "man",
+                        "new",
+                        "now",
+                        "old",
+                        "see",
+                        "two",
+                        "way",
+                        "who",
+                        "boy",
+                        "did",
+                        "its",
+                        "let",
+                        "put",
+                        "say",
+                        "she",
+                        "too",
+                        "use",
+                        "hello",
+                        "world",
+                        "test",
+                        "this",
+                        "that",
+                        "with",
+                        "from",
+                        "they",
+                        "know",
+                        "want",
+                        "been",
+                        "good",
+                        "much",
+                        "some",
+                        "time",
+                        "very",
+                        "when",
+                        "come",
+                        "here",
+                        "just",
+                        "like",
+                        "long",
+                        "make",
+                        "many",
+                        "over",
+                        "such",
+                        "take",
+                        "than",
+                        "them",
+                        "well",
+                        "were",
+                        "https",
+                        "www",
+                        "example",
+                        "com",
+                    ]
+                )
+                and len([c for c in t if c.isalpha()]) > 0
+                and sum(1 for c in t.lower() if c in "aeiou")
+                / len([c for c in t if c.isalpha()])
+                < 0.3
+            ),
         ),  # Low vowel ratio suggests encoding
         # A1Z26 (numbers separated by spaces, commas, or dashes, numbers should be 1-26)
         (
             "a1z26",
-            lambda t: all(c.isdigit() or c in " ,-" for c in t)
-            and any(c.isdigit() for c in t)
-            and len(
-                [
-                    x
+            lambda t: (
+                all(c.isdigit() or c in " ,-" for c in t)
+                and any(c.isdigit() for c in t)
+                and len(
+                    [
+                        x
+                        for x in t.replace(",", " ").replace("-", " ").split()
+                        if x.isdigit()
+                    ]
+                )
+                >= 2
+                and all(
+                    1 <= int(x) <= 26
                     for x in t.replace(",", " ").replace("-", " ").split()
                     if x.isdigit()
-                ]
-            )
-            >= 2
-            and all(
-                1 <= int(x) <= 26
-                for x in t.replace(",", " ").replace("-", " ").split()
-                if x.isdigit()
+                )
             ),
         ),
         # HTML entities
         (
             "html",
-            lambda t: "&" in t
-            and ";" in t
-            and any(
-                entity in t
-                for entity in ["&amp;", "&lt;", "&gt;", "&quot;", "&apos;", "&#"]
+            lambda t: (
+                "&" in t
+                and ";" in t
+                and any(
+                    entity in t
+                    for entity in ["&amp;", "&lt;", "&gt;", "&quot;", "&apos;", "&#"]
+                )
             ),
         ),
         # Reverse text (very restrictive: only if it looks like reversed English and doesn't contain common patterns)
         (
             "reverse",
-            lambda t: len(t) >= 8
-            and any(c.isalpha() for c in t)
-            and not all(c.isdigit() or c.isspace() for c in t)
-            and not t.lower().startswith(
-                (
-                    "hello",
-                    "test",
-                    "the ",
-                    "and ",
-                    "for ",
-                    "this ",
-                    "that ",
-                    "with ",
-                    "user",
-                    "http",
-                    "www",
-                    "mixed",
+            lambda t: (
+                len(t) >= 8
+                and any(c.isalpha() for c in t)
+                and not all(c.isdigit() or c.isspace() for c in t)
+                and not t.lower().startswith(
+                    (
+                        "hello",
+                        "test",
+                        "the ",
+                        "and ",
+                        "for ",
+                        "this ",
+                        "that ",
+                        "with ",
+                        "user",
+                        "http",
+                        "www",
+                        "mixed",
+                    )
                 )
-            )
-            and not any(
-                word in t.lower()
-                for word in [
-                    "hello",
-                    "world",
-                    "test",
-                    "the",
-                    "and",
-                    "for",
-                    "this",
-                    "that",
-                    "user",
-                    "example",
-                    "com",
-                    "case",
-                    "text",
-                    "with",
-                ]
-            )
-            and t.count(" ") <= 2,
+                and not any(
+                    word in t.lower()
+                    for word in [
+                        "hello",
+                        "world",
+                        "test",
+                        "the",
+                        "and",
+                        "for",
+                        "this",
+                        "that",
+                        "user",
+                        "example",
+                        "com",
+                        "case",
+                        "text",
+                        "with",
+                    ]
+                )
+                and t.count(" ") <= 2
+            ),
         ),  # Reversed text usually has fewer spaces
     ]
 
@@ -2641,8 +2661,10 @@ def detect_operation(text: str, method: str) -> str:
             c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=" for c in t.strip().upper()
         ),
         "base16": lambda t: all(c in "0123456789ABCDEFabcdef" for c in t.strip()),
-        "hex": lambda t: all(c in "0123456789ABCDEFabcdef" for c in t.strip())
-        and len(t.strip()) % 2 == 0,
+        "hex": lambda t: (
+            all(c in "0123456789ABCDEFabcdef" for c in t.strip())
+            and len(t.strip()) % 2 == 0
+        ),
         "binary": lambda t: all(c in "01 " for c in t.strip()),
         "morse": lambda t: all(c in ".-/ " for c in t.strip()),
         "url": lambda t: "%" in t and any(c in "0123456789ABCDEFabcdef" for c in t),

@@ -596,7 +596,7 @@ def _safe_format_template(
             filtered_data[key] = value
         # Keep essential fields even if N/A for template compatibility
         elif key in ["title", "year", "url", "url_cast", "url_releaseinfo", "kind"]:
-            filtered_data[key] = value if value else "Unknown"
+            filtered_data[key] = value or "Unknown"
         else:
             filtered_data[key] = ""  # Empty string for unavailable optional fields
 
@@ -858,7 +858,7 @@ async def imdb_search(_, message: Message):
     # Add movies to buttons
     for movie in movies:
         # Get year safely, ensuring it's not None
-        year = movie.get("year") if movie.get("year") else ""
+        year = movie.get("year") or ""
         title = movie.get("title")
         # Format the button text with year only if it exists
         button_text = f"🎬 {title} ({year})" if year else f"🎬 {title}"

@@ -222,7 +222,7 @@ class BitlyAPI:
         """
         try:
             # Extract domain from bitlink_id (e.g., "bit.ly/abc123" -> "bit.ly")
-            domain = bitlink_id.split("/")[0]
+            domain = bitlink_id.split("/", maxsplit=1)[0]
             custom_bitlink = f"{domain}/{custom_alias}"
 
             custom_data = {

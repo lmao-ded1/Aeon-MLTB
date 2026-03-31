@@ -58,8 +58,12 @@ FONT_STYLES = {
     # The following combinations are valid according to Telegram docs:
     "bold_spoiler": lambda text: f"<spoiler><b>{text}</b></spoiler>",
     "italic_spoiler": lambda text: f"<spoiler><i>{text}</i></spoiler>",
-    "bold_quote_expandable": lambda text: f"<blockquote expandable><b>{text}</b></blockquote>",
-    "italic_quote_expandable": lambda text: f"<blockquote expandable><i>{text}</i></blockquote>",
+    "bold_quote_expandable": lambda text: (
+        f"<blockquote expandable><b>{text}</b></blockquote>"
+    ),
+    "italic_quote_expandable": lambda text: (
+        f"<blockquote expandable><i>{text}</i></blockquote>"
+    ),
 }
 
 # Unicode character mappings for different font styles

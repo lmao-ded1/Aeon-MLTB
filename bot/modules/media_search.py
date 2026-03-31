@@ -1592,7 +1592,7 @@ async def media_get_callback(_, query):
 
     # IMPORTANT: Always use bot client for message retrieval when possible
     # Only fall back to user client if bot client fails
-    client = TgClient.bot if TgClient.bot else TgClient.user
+    client = TgClient.bot or TgClient.user
     client_type = "bot" if TgClient.bot else "user"
 
     # Check if the selected client is available
@@ -2359,7 +2359,7 @@ async def chosen_inline_result_handler(_, chosen_inline_result):
             return
 
         # Try to get the message with bot client first
-        client = TgClient.bot if TgClient.bot else TgClient.user
+        client = TgClient.bot or TgClient.user
 
         # Check if the client is available
         if not client:
@@ -2665,7 +2665,7 @@ async def handle_media_get_command(client, message):
 
         # IMPORTANT: Always use bot client for message retrieval when possible
         # Only fall back to user client if bot client fails
-        client_to_use = TgClient.bot if TgClient.bot else TgClient.user
+        client_to_use = TgClient.bot or TgClient.user
         client_type_to_use = "bot" if TgClient.bot else "user"
 
         # Check if the selected client is available

@@ -2728,7 +2728,7 @@ Other settings like concurrent downloads, search results, and database tracking 
             )
 
             # For boolean settings, add toggle buttons with status
-            if setting in ["STREAMRIP_QUALITY_FALLBACK_ENABLED"]:
+            if setting == "STREAMRIP_QUALITY_FALLBACK_ENABLED":
                 setting_value = getattr(Config, setting, False)
                 status = "✅ ON" if setting_value else "❌ OFF"
                 display_name = f"{display_name}: {status}"
@@ -2812,9 +2812,10 @@ Other settings like concurrent downloads, search results, and database tracking 
             )
 
             # For boolean settings, add toggle buttons with status
-            if setting.endswith("_ENABLED") or setting in [
-                "STREAMRIP_QOBUZ_USE_AUTH_TOKEN"
-            ]:
+            if (
+                setting.endswith("_ENABLED")
+                or setting == "STREAMRIP_QOBUZ_USE_AUTH_TOKEN"
+            ):
                 setting_value = getattr(Config, setting, False)
                 status = "✅ ON" if setting_value else "❌ OFF"
                 display_name = f"{display_name}: {status}"
@@ -3538,7 +3539,7 @@ Platform-specific settings for enhanced functionality and compatibility with dif
             )
 
             # For boolean settings, add toggle buttons with status
-            if setting in ["STREAMRIP_CONVERSION_ENABLED"]:
+            if setting == "STREAMRIP_CONVERSION_ENABLED":
                 setting_value = getattr(Config, setting, False)
                 status = "✅ ON" if setting_value else "❌ OFF"
                 display_name = f"{display_name}: {status}"
@@ -4228,7 +4229,7 @@ These settings control what additional information is saved with downloaded cont
             display_name = setting.replace("ZOTIFY_", "").replace("_", " ").title()
 
             # For boolean settings, add toggle buttons with status
-            if setting in ["ZOTIFY_MATCH_EXISTING"]:
+            if setting == "ZOTIFY_MATCH_EXISTING":
                 setting_value = getattr(Config, setting, False)
                 status = "✅ ON" if setting_value else "❌ OFF"
                 display_name = f"{display_name}: {status}"
@@ -9943,7 +9944,7 @@ async def handle_watermark_image_upload(_, message):
     from_bot_settings = handler_dict.get(f"{user_id}_from_bot_settings", False)
 
     # Get the original message for returning to the menu later
-    original_message = handler_dict.get(f"{user_id}_original_message", None)
+    original_message = handler_dict.get(f"{user_id}_original_message")
 
     # Create a temporary directory if it doesn't exist
     temp_dir = f"{getcwd()}/temp/watermarks"
@@ -14364,7 +14365,7 @@ async def edit_bot_settings(client, query):
             and not data[2].startswith("YOUTUBE_UPLOAD_")
             and not data[2].startswith("MEGA_")
             and not data[2].startswith("AI_")
-            and data[2] not in ["DEFAULT_AI_MODEL"]
+            and data[2] != "DEFAULT_AI_MODEL"
         ):
             # In view mode, show the current value in a popup
             value = f"{Config.get(data[2])}"
@@ -14575,9 +14576,7 @@ async def edit_bot_settings(client, query):
                     "ZOTIFY_TRANSCODE_BITRATE",
                 ]:
                     back_menu = "zotify_quality"
-                elif data[2] in [
-                    "ZOTIFY_CREDENTIALS_PATH",
-                ]:
+                elif data[2] == "ZOTIFY_CREDENTIALS_PATH":
                     back_menu = "zotify_auth"
                 elif data[2] in [
                     "ZOTIFY_ALBUM_LIBRARY",
@@ -15066,9 +15065,7 @@ async def edit_bot_settings(client, query):
                 "ZOTIFY_TRANSCODE_BITRATE",
             ]:
                 return_menu = "zotify_quality"
-            elif data[2] in [
-                "ZOTIFY_CREDENTIALS_PATH",
-            ]:
+            elif data[2] == "ZOTIFY_CREDENTIALS_PATH":
                 return_menu = "zotify_auth"
             elif data[2] in [
                 "ZOTIFY_ALBUM_LIBRARY",
@@ -18040,7 +18037,7 @@ No database-only files found."""
             return_menu = "archiveflags"
         elif key.startswith("STREAMRIP_") and key != "STREAMRIP_ENABLED":
             # For streamrip settings (except STREAMRIP_ENABLED which is handled in operations), determine which submenu to return to
-            if key in ["STREAMRIP_AUTO_CONVERT"]:
+            if key == "STREAMRIP_AUTO_CONVERT":
                 return_menu = "streamrip_general"
             elif key in [
                 "STREAMRIP_DEFAULT_QUALITY",

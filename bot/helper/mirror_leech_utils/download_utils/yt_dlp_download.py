@@ -192,14 +192,18 @@ class YoutubeDLHelper:
         # Sort by cookie number
         try:
             cookies_list.sort(
-                key=lambda x: int(
-                    ospath.basename(x).replace(f"{user_id}_", "").replace(".txt", "")
+                key=lambda x: (
+                    int(
+                        ospath.basename(x)
+                        .replace(f"{user_id}_", "")
+                        .replace(".txt", "")
+                    )
+                    if ospath.basename(x)
+                    .replace(f"{user_id}_", "")
+                    .replace(".txt", "")
+                    .isdigit()
+                    else 999
                 )
-                if ospath.basename(x)
-                .replace(f"{user_id}_", "")
-                .replace(".txt", "")
-                .isdigit()
-                else 999
             )
         except Exception as e:
             LOGGER.error(f"Error sorting cookies list: {e}")

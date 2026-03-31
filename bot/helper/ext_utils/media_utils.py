@@ -1035,7 +1035,7 @@ async def get_audio_thumbnail(audio_file):
     ]
 
     try:
-        _, err, code = await wait_for(cmd_exec(cmd), timeout=30)
+        _, _err, code = await wait_for(cmd_exec(cmd), timeout=30)
         if code == 0 and await aiopath.exists(output):
             output_size = await aiopath.getsize(output)
             if output_size > 0:
@@ -1476,7 +1476,7 @@ async def extract_track(
             )
 
             try:
-                stdout, stderr, code = await cmd_exec(cmd)
+                _stdout, stderr, code = await cmd_exec(cmd)
                 if (
                     code == 0
                     and await aiopath.exists(output_file)
@@ -1580,7 +1580,7 @@ async def extract_track(
                                 alt_output_file,
                             ]
 
-                            alt_stdout, alt_stderr, alt_code = await cmd_exec(
+                            _alt_stdout, alt_stderr, alt_code = await cmd_exec(
                                 alt_cmd
                             )
                             if (
@@ -1861,7 +1861,7 @@ async def remove_track(
         LOGGER.info(f"Command: {' '.join(cmd)}")
 
         # Execute the command
-        stdout, stderr, code = await cmd_exec(cmd)
+        _stdout, stderr, code = await cmd_exec(cmd)
 
         if code == 0 and await aiopath.exists(output_path):
             file_size = await aiopath.getsize(output_path)
@@ -2017,7 +2017,7 @@ async def remove_all_tracks(
         LOGGER.info(f"Command: {' '.join(cmd)}")
 
         # Execute the command
-        stdout, stderr, code = await cmd_exec(cmd)
+        _stdout, stderr, code = await cmd_exec(cmd)
 
         if code == 0 and await aiopath.exists(output_path):
             file_size = await aiopath.getsize(output_path)
@@ -2328,7 +2328,7 @@ async def proceed_extract(
             return []
 
         # Check if the requested extraction is compatible with the media type
-        if extract_video and media_type not in ["video"]:
+        if extract_video and media_type != "video":
             extract_video = False
 
         if extract_audio and media_type not in ["video", "audio"]:
@@ -2337,7 +2337,7 @@ async def proceed_extract(
         if extract_subtitle and media_type not in ["video", "subtitle"]:
             extract_subtitle = False
 
-        if extract_attachment and media_type not in ["video"]:
+        if extract_attachment and media_type != "video":
             extract_attachment = False
 
         # Check if any extraction type is still enabled
@@ -5189,8 +5189,8 @@ class FFMpeg:
         """
         self.clear()
         self._total_time = (await get_media_info(f_path))[0]
-        base_name, ext = ospath.splitext(f_path)
-        dir, base_name = base_name.rsplit("/", 1)
+        base_name, _ext = ospath.splitext(f_path)
+        _dir, base_name = base_name.rsplit("/", 1)
 
         # Check if ffmpeg is a list of commands to run sequentially
         if isinstance(ffmpeg, list) and ffmpeg:
@@ -5840,7 +5840,7 @@ class FFMpeg:
                     LOGGER.info(f"Found dynamic output placeholder: {output_file}")
                     LOGGER.info(f"Dynamic match: {dynamic_match.group(0)}")
                     LOGGER.info(
-                        f"Format width: {dynamic_match.group(1) if dynamic_match.group(1) else 'default'}"
+                        f"Format width: {dynamic_match.group(1) or 'default'}"
                     )
 
                     # Extract the format specifier (e.g., %d, %3d, %03d)
@@ -8899,7 +8899,7 @@ async def apply_document_metadata(file_path, title=None, author=None, comment=No
 
         # Get media information if it's a media file
         try:
-            duration, artist, title = await get_media_info(file_path)
+            duration, _artist, title = await get_media_info(file_path)
             if duration and duration > 0:
                 hours = duration // 3600
                 minutes = (duration % 3600) // 60

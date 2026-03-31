@@ -8039,7 +8039,7 @@ async def get_menu(option, message, user_id):
         current_value = "default.otf (Default)"
     elif option == "WATERMARK_PRIORITY":
         current_value = "2 (Default)"
-    elif option in {"WATERMARK_THREADING"}:
+    elif option == "WATERMARK_THREADING":
         current_value = "True (Default)"
     elif option == "WATERMARK_OPACITY":
         current_value = "1.0 (Default)"
@@ -9142,7 +9142,7 @@ async def edit_media_tools_settings(client, query):
             del handler_dict[f"{user_id}_from_bot_settings"]
 
         # Get the original message if it exists
-        original_message = handler_dict.get(f"{user_id}_original_message", None)
+        original_message = handler_dict.get(f"{user_id}_original_message")
 
         # Clean up the original_message entry
         if f"{user_id}_original_message" in handler_dict:
@@ -11656,7 +11656,7 @@ async def handle_watermark_image_upload(_, message):
         await asyncio.sleep(1)
 
         # Get the original message that was waiting for the upload
-        original_message = handler_dict.get(f"{user_id}_original_message", None)
+        original_message = handler_dict.get(f"{user_id}_original_message")
 
         # Automatically return to the watermark menu
         if hasattr(message, "from_bot_settings") and message.from_bot_settings:
@@ -11701,7 +11701,7 @@ async def handle_watermark_image_upload(_, message):
         await asyncio.sleep(2)  # Wait a moment for the user to see the error
 
         # Get the original message that was waiting for the upload
-        original_message = handler_dict.get(f"{user_id}_original_message", None)
+        original_message = handler_dict.get(f"{user_id}_original_message")
 
         if hasattr(message, "from_bot_settings") and message.from_bot_settings:
             # Return to bot_settings watermark menu

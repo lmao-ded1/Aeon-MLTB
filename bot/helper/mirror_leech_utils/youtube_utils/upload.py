@@ -697,7 +697,7 @@ class YouTubeUpload:
         if failed_uploads:
             LOGGER.warning(f"Failed uploads: {', '.join(failed_uploads)}")
 
-        return uploaded_videos if uploaded_videos else None
+        return uploaded_videos or None
 
     def _is_video_file(self, file_path):
         """Check if file is a supported video format"""

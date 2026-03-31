@@ -161,7 +161,7 @@ async def copy_message_safe(
     while retry_count < max_retries:
         try:
             # Use user client if available for better access, otherwise bot client
-            client = TgClient.user if TgClient.user else TgClient.bot
+            client = TgClient.user or TgClient.bot
             is_bot = await is_bot_client(client)
 
             # For bot clients, skip copy_message and go directly to forward_messages
@@ -615,7 +615,7 @@ async def next_batch_callback(_client, callback_query):
     await callback_query.answer("🔄 Getting next batch...")
 
     # Get next batch of messages
-    client_to_use = TgClient.user if TgClient.user else TgClient.bot
+    client_to_use = TgClient.user or TgClient.bot
     messages = await get_messages_batch(
         client_to_use,
         state["source_chat_id"],
@@ -671,7 +671,7 @@ async def forward_batch_callback(_client, callback_query):
     await callback_query.answer("🚀 Starting batch forwarding...")
 
     # Get the current batch of messages
-    client_to_use = TgClient.user if TgClient.user else TgClient.bot
+    client_to_use = TgClient.user or TgClient.bot
     messages = await get_messages_batch(
         client_to_use,
         state["source_chat_id"],
@@ -1439,7 +1439,7 @@ async def forward_command(_client, message: Message):
     )
 
     try:
-        client_to_use = TgClient.user if TgClient.user else TgClient.bot
+        client_to_use = TgClient.user or TgClient.bot
         await client_to_use.resolve_peer(destination_chat_id)
     except Exception as dest_error:
         if hasattr(dest_error, "ID") and dest_error.ID == "CHANNEL_INVALID":
@@ -1679,7 +1679,7 @@ async def auto_forward_handler(_client, message: Message):
     # Send completion message to owner if any messages were processed
     if (forwarded_count > 0 or failed_count > 0) and Config.OWNER_ID:
         try:
-            client_to_use = TgClient.user if TgClient.user else TgClient.bot
+            client_to_use = TgClient.user or TgClient.bot
             await client_to_use.send_message(
                 Config.OWNER_ID,
                 f"🔄 <b>Auto Forward Completed</b>\n\n"

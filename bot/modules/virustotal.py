@@ -476,15 +476,11 @@ async def scan_file(client, message, file_msg):
         file_size = file_msg.document.file_size
         # We don't need file_id here as we'll use the file_msg directly for download
     elif file_msg.video:
-        file_name = (
-            file_msg.video.file_name if file_msg.video.file_name else "video.mp4"
-        )
+        file_name = file_msg.video.file_name or "video.mp4"
         file_size = file_msg.video.file_size
         # We don't need file_id here as we'll use the file_msg directly for download
     elif file_msg.audio:
-        file_name = (
-            file_msg.audio.file_name if file_msg.audio.file_name else "audio.mp3"
-        )
+        file_name = file_msg.audio.file_name or "audio.mp3"
         file_size = file_msg.audio.file_size
         # We don't need file_id here as we'll use the file_msg directly for download
     elif file_msg.photo:

@@ -126,7 +126,7 @@ class NSFWTestSuite:
             "obfuscated_nsfw",
             "multilingual_nsfw",
         ]
-        expected_clean = category in ["clean_content"]
+        expected_clean = category == "clean_content"
 
         for test_case in test_cases:
             try:

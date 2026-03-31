@@ -526,7 +526,7 @@ class StreamripDownloadHelper:
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                 )
-                stdout, stderr = await check_process.communicate()
+                _stdout, _stderr = await check_process.communicate()
 
                 if check_process.returncode != 0:
                     LOGGER.error("Streamrip 'rip' command not found")
@@ -647,8 +647,8 @@ class StreamripDownloadHelper:
                     end_time - start_time
 
                     # Process the result
-                    stdout_text = result.stdout if result.stdout else ""
-                    stderr_text = result.stderr if result.stderr else ""
+                    stdout_text = result.stdout or ""
+                    stderr_text = result.stderr or ""
 
                     if result.returncode == 0:
                         # Check for download activity in stdout

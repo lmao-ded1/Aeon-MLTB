@@ -31,7 +31,7 @@ def namespace_of(message):
 
 
 def log_input(message):
-    text = message.text if message.text else "[No text content]"
+    text = message.text or "[No text content]"
     LOGGER.info(
         f"IN: {text} (user={message.from_user.id if message.from_user else message.sender_chat.id}, chat={message.chat.id})",
     )
